@@ -11,22 +11,22 @@ public class UserService : IUserService
 {
     private readonly IUsersRepository _usersRepository;
     private readonly IPasswordEncoder _passwordEncoder;
-    private readonly UserMapper _userMapper;
+    private readonly UserResponseMapper _userResponseMapper;
 
-    public UserService(IUsersRepository usersRepository, IPasswordEncoder passwordEncoder, UserMapper userMapper)
+    public UserService(IUsersRepository usersRepository, IPasswordEncoder passwordEncoder, UserResponseMapper userResponseMapper)
     {
         _usersRepository = usersRepository;
         _passwordEncoder = passwordEncoder;
-        _userMapper = userMapper;
+        _userResponseMapper = userResponseMapper;
     }
-    
+
     public async Task<Result<UserResponse>> CreateUserAsync(CreateUserDto createUserDto)
     {
-        if (!await _usersRepository.IsLoginUniqueAsync(createUserDto.Login)) 
+        if (!await _usersRepository.IsLoginUniqueAsync(createUserDto.Login))
             return new Result<UserResponse>.FailureType("Login already exists");
 
         var hashedPassword = _passwordEncoder.HashPassword(createUserDto.Password);
-    
+
         var now = DateTime.UtcNow;
         var userId = Guid.NewGuid();
         var currentUser = "system"; // TODO: взять актуального пользователя из контекста
@@ -45,14 +45,12 @@ public class UserService : IUserService
             currentUser,
             null,
             null);
-        
 
-        return await userModelResult.MatchAsync<UserModel, Result<UserResponse>>(
-            async user => {
-                await _usersRepository.CreateAsync(user);
-                return Result<UserResponse>.Success(_userMapper.ToResponse(user));
-            },
-            error => Task.FromResult(Result<UserResponse>.Failure(error))
-        );
+        var user = userModelResult.TryGetValue(out var error);
+        if (user is null)
+            return new Result<UserResponse>.FailureType(error); 
+
+        await _usersRepository.CreateAsync(user);
+        return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
     }
 }

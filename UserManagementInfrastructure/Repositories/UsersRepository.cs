@@ -9,21 +9,21 @@ namespace Infrastructure.Repositories;
 public class UsersRepository : IUsersRepository
 {
     private readonly UserDbContext _dbContext;
-    private readonly UserMapper _mapper;
+    private readonly UserPersistenceMapper _persistenceMapper;
 
-    public UsersRepository(UserDbContext dbContext, UserMapper mapper)
+    public UsersRepository(UserDbContext dbContext, UserPersistenceMapper persistenceMapper)
     {
         _dbContext = dbContext;
-        _mapper = mapper;
+        _persistenceMapper = persistenceMapper;
     }
 
     public async Task<UserModel?> GetByLoginAsync(string login)
     {
         var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Login == login);
         if (userEntity == null)
-            throw new InvalidOperationException("User not found");
+            return null;
 
-        return _mapper.ToDomain(userEntity);
+        return _persistenceMapper.ToDomain(userEntity);
     }
 
     public async Task<List<UserModel>> GetActiveUsersAsync()
@@ -35,7 +35,7 @@ public class UsersRepository : IUsersRepository
             .ToListAsync();
         
         var activeUsers = activeUsersEntities
-            .Select(_mapper.ToDomain)
+            .Select(_persistenceMapper.ToDomain)
             .Where(u => u != null)
             .Cast<UserModel>()
             .ToList();
@@ -50,7 +50,7 @@ public class UsersRepository : IUsersRepository
             .ToListAsync();
         
         return entities
-            .Select(_mapper.ToDomain)
+            .Select(_persistenceMapper.ToDomain)
             .Where(u => u is not null)
             .Cast<UserModel>()
             .ToList();
@@ -63,7 +63,7 @@ public class UsersRepository : IUsersRepository
 
     public async Task<UserModel> CreateAsync(UserModel userModel)
     {
-        var userEntity = _mapper.ToEntity(userModel);
+        var userEntity = _persistenceMapper.ToEntity(userModel);
         await _dbContext.Users.AddAsync(userEntity);
         await _dbContext.SaveChangesAsync();
 
@@ -76,7 +76,7 @@ public class UsersRepository : IUsersRepository
         if (existingEntity == null)
             throw new InvalidOperationException("User not found");
 
-        var updatedEntity = _mapper.ToEntity(userModel);
+        var updatedEntity = _persistenceMapper.ToEntity(userModel);
         
         _dbContext.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
 

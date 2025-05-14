@@ -3,7 +3,7 @@ using UserManagementCore.Models;
 
 namespace UserManagementApplication.Mappers;
 
-public class UserMapper
+public class UserResponseMapper
 {
     public UserResponse ToResponse(UserModel user)
     {
