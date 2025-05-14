@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using UserManagementApplication.Abstractions;
+using UserManagementCore.Common;
 using UserManagementCore.Contracts;
 
 namespace UserManagementApplication.Services;
@@ -19,17 +19,26 @@ public class AuthService : IAuthService
         _passwordEncoder = passwordEncoder;
         _jwtProvider = jwtProvider;
     }
-    
-    public async Task<string> Login(string login, string password)
-    {
-        var user = await _usersRepository.GetByLoginAsync(login);
-        var result = _passwordEncoder.VerifyPassword(password, user.Password);
 
-        if (result is false)
+    public async Task<Result<string>> Login(string login, string password)
+    {
+        try
         {
-            //TODO: сделеть отдельный возвращаемый тип ResultAuth с Sucess(token) и Fail(error)
+            var user = await _usersRepository.FindByLoginAsync(login);
+            if (user == null)
+                return Result<string>.Failure("User not found");
+
+            if (_passwordEncoder.VerifyPassword(password, user.Password) is false)
+                return Result<string>.Failure("Invalid credentials");
+
+            if (user.RevokedOn != null)
+                return Result<string>.Failure("User is revoked");
+
+            return Result<string>.Success(_jwtProvider.GenerateToken(user));
         }
-        
-        return _jwtProvider.GenerateToken(user);
+        catch (Exception ex)
+        {
+            return Result<string>.Failure(ex.Message);
+        }
     }
 }

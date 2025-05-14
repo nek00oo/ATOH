@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using UserManagementCore.Contracts;
 using UserManagementCore.Models;
 
-namespace Infrastructure.Auth;
+namespace Infrastructure.Authentication;
 
 public class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
 {
@@ -14,7 +14,10 @@ public class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
 
     public string GenerateToken(UserModel user)
     {
-        Claim[] claims = [new("Id", user.Id.ToString())];
+        Claim[] claims = [
+            new("Login", user.Login),
+            new("Admin", user.Admin.ToString().ToLower())
+        ];
         
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
