@@ -2,19 +2,20 @@ namespace UserManagementCore.Common;
 
 public static class ResultExtensions
 {
-    public static T? TryGetValue<T>(this Result<T> result, out string error)
+    public static T? TryGetValue<T>(this Result<T> result, out string message)
     {
-        error = "";
-    
-        if (result is Result<T>.SuccessType success)
-            return success.Value;
-        
-        if (result is Result<T>.FailureType failure)
+        message = result switch
         {
-            error = failure.Error;
-            return default;
-        }
+            Result<T>.SuccessType success => "",
+            Result<T>.FailureType failure => failure.Error,
+            Result<T>.NotFoundType notFound => notFound.Message,
+            _ => throw new InvalidOperationException("Unknown Result type")
+        };
 
-        throw new InvalidOperationException("Unknown Result type");
+        return result switch
+        {
+            Result<T>.SuccessType success => success.Value,
+            _ => default
+        };
     }
 }

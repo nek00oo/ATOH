@@ -75,7 +75,7 @@ public class UserService : IUserService
             var user = await _usersRepository.FindByLoginAsync(login);
             
             if (user is null)
-                return Result<UserResponse>.Failure("User not found");
+                return Result<UserResponse>.NotFound("User not found");
             
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
         }
@@ -123,7 +123,7 @@ public class UserService : IUserService
         {
             var targetUser = await _usersRepository.FindByLoginAsync(login);
             if (targetUser == null)
-                return Result<UserResponse>.Failure("User not found");
+                return Result<UserResponse>.NotFound("User not found");
 
             if (targetUser.RevokedOn != null)
                 return Result<UserResponse>.Failure("User is revoked");
@@ -153,7 +153,7 @@ public class UserService : IUserService
         {
             var targetUser = await _usersRepository.FindByLoginAsync(login);
             if (targetUser == null)
-                return Result<UserResponse>.Failure("User not found");
+                return Result<UserResponse>.NotFound("User not found");
             
             if (targetUser.RevokedOn != null)
                 return Result<UserResponse>.Failure("User is revoked");
@@ -188,7 +188,7 @@ public class UserService : IUserService
         {
             var targetUser = await _usersRepository.FindByLoginAsync(currentLogin);
             if (targetUser == null)
-                return Result<UserResponse>.Failure("User not found");
+                return Result<UserResponse>.NotFound("User not found");
             
             if (targetUser.RevokedOn != null)
                 return Result<UserResponse>.Failure("User is revoked");
@@ -219,7 +219,7 @@ public class UserService : IUserService
         {
             var targetUser = await _usersRepository.FindByLoginAsync(login);
             if (targetUser is null)
-                return Result<bool>.Failure("User not found");
+                return Result<bool>.NotFound("User not found");
 
             bool result;
             if (softDelete)

@@ -36,6 +36,10 @@ services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API для управления пользователями. Использует JWT + Cookies аутентификацию."
     });
+    
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 
     c.AddSecurityDefinition("JWT_Cookie", new OpenApiSecurityScheme
     {
@@ -43,14 +47,6 @@ services.AddSwaggerGen(c =>
         In = ParameterLocation.Cookie,
         Name = "token",
         Description = "JWT токен в cookie. Требуется для аутентифицированных запросов."
-    });
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "JWT Authorization header (альтернативный способ аутентификации)"
     });
     
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -78,6 +74,9 @@ services.AddSingleton<UserPersistenceMapper>();
 services.AddSingleton<UserResponseMapper>();
 services.AddSingleton<IPasswordEncoder, PasswordEncoder>();
 services.AddSingleton<IValidator<CreateUserDto>, CreateUserValidator>();
+services.AddSingleton<IValidator<UpdateProfileDto>, UpdateProfileUserValidator>();
+services.AddSingleton<IValidator<ChangeLoginDto>, ChangeLoginUserValidator>();
+services.AddSingleton<IValidator<ChangePasswordDto>, ChangePasswordUserValidator>();
 
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IAuthService, AuthService>();

@@ -14,7 +14,7 @@ public class UserPersistenceMapper
                 entity.Password,
                 entity.Name,
                 entity.Gender,
-                entity.Birthday ?? DateTime.MinValue,
+                entity.Birthday,
                 entity.Admin,
                 entity.CreatedOn,
                 entity.CreatedBy,

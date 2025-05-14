@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         {
             var user = await _usersRepository.FindByLoginAsync(login);
             if (user == null)
-                return Result<string>.Failure("User not found");
+                return Result<string>.NotFound("User not found");
 
             if (_passwordEncoder.VerifyPassword(password, user.Password) is false)
                 return Result<string>.Failure("Invalid credentials");
