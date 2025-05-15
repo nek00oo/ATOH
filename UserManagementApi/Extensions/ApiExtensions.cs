@@ -32,7 +32,14 @@ public static class ApiExtensions
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["token"];
+                        var tokenFromHeader = context.Request.Headers["Authorization"]
+                            .FirstOrDefault()?
+                            .Split(" ")
+                            .Last();
+                        
+                        var tokenFromCookie = context.Request.Cookies["token"];
+
+                        context.Token = tokenFromHeader ?? tokenFromCookie;
                         return Task.CompletedTask;
                     }
                 };

@@ -29,10 +29,10 @@ public class UserService : IUserService
         try
         {
             var user = await _usersRepository.FindByLoginAsync(createUserDto.Login);
-            
+
             if (user is not null)
                 return Result<UserResponse>.Failure($"User with login {createUserDto.Login} already exists");
-            
+
             var hashedPassword = _passwordEncoder.HashPassword(createUserDto.Password);
             var now = DateTime.UtcNow;
 
@@ -73,10 +73,10 @@ public class UserService : IUserService
         try
         {
             var user = await _usersRepository.FindByLoginAsync(login);
-            
+
             if (user is null)
                 return Result<UserResponse>.NotFound("User not found");
-            
+
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
         }
         catch (InvalidOperationException ex)
@@ -122,10 +122,10 @@ public class UserService : IUserService
         try
         {
             var targetUser = await _usersRepository.FindByLoginAsync(login);
-            if (targetUser == null)
+            if (targetUser is null)
                 return Result<UserResponse>.NotFound("User not found");
 
-            if (targetUser.RevokedOn != null)
+            if (targetUser.RevokedOn is not null)
                 return Result<UserResponse>.Failure("User is revoked");
 
             var updatedUser = await _usersRepository.UpdateProfileAsync(
@@ -152,14 +152,17 @@ public class UserService : IUserService
         try
         {
             var targetUser = await _usersRepository.FindByLoginAsync(login);
-            if (targetUser == null)
+            if (targetUser is null)
                 return Result<UserResponse>.NotFound("User not found");
-            
-            if (targetUser.RevokedOn != null)
-                return Result<UserResponse>.Failure("User is revoked");
 
-            if (dto.OldPassword != null &&
-                !_passwordEncoder.VerifyPassword(dto.OldPassword, targetUser.Password))
+            if (targetUser.RevokedOn is not null)
+                return Result<UserResponse>.Failure("User is revoked");
+            
+            var isAdmin = (await _usersRepository.FindByLoginAsync(modifiedBy))?.Admin ?? false;
+            
+            if (isAdmin is false &&
+                dto.OldPassword is not null &&
+                _passwordEncoder.VerifyPassword(dto.OldPassword, targetUser.Password) is false)
             {
                 return Result<UserResponse>.Failure("Invalid old password");
             }
@@ -181,21 +184,21 @@ public class UserService : IUserService
             return Result<UserResponse>.Failure($"Password change failed: {ex.Message}");
         }
     }
-    
+
     public async Task<Result<UserResponse>> ChangeLoginAsync(string currentLogin, ChangeLoginDto dto, string modifiedBy)
     {
         try
         {
             var targetUser = await _usersRepository.FindByLoginAsync(currentLogin);
-            if (targetUser == null)
+            if (targetUser is null)
                 return Result<UserResponse>.NotFound("User not found");
-            
-            if (targetUser.RevokedOn != null)
+
+            if (targetUser.RevokedOn is not null)
                 return Result<UserResponse>.Failure("User is revoked");
 
             if (await _usersRepository.FindByLoginAsync(dto.NewLogin) is not null)
                 return Result<UserResponse>.Failure("Login already exists");
-            
+
             var updatedUser = await _usersRepository.ChangeLoginAsync(
                 currentLogin,
                 dto.NewLogin,
@@ -212,7 +215,7 @@ public class UserService : IUserService
             return Result<UserResponse>.Failure($"Login change failed: {ex.Message}");
         }
     }
-    
+
     public async Task<Result<bool>> DeleteUserAsync(string login, bool softDelete, string revokedBy)
     {
         try
@@ -238,7 +241,7 @@ public class UserService : IUserService
             return Result<bool>.Failure($"Delete failed: {ex.Message}");
         }
     }
-    
+
     public async Task<Result<UserResponse>> RestoreUserAsync(string login)
     {
         try
@@ -246,7 +249,7 @@ public class UserService : IUserService
             var targetUser = await _usersRepository.FindByLoginAsync(login);
             if (targetUser is null)
                 return Result<UserResponse>.NotFound("User not found");
-            
+
             var user = await _usersRepository.RestoreAsync(login);
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
         }

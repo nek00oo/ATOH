@@ -15,5 +15,9 @@ public class UpdateProfileUserValidator : AbstractValidator<UpdateProfileDto>
         RuleFor(x => x.Gender)
             .Must(gender => Enum.IsDefined(typeof(Gender), gender))
             .WithMessage("Invalid gender value.");
+        
+        RuleFor(x => x.Birthday)
+            .Must(birthday => !birthday.HasValue || birthday.Value.Date <= DateTime.UtcNow.Date)
+            .WithMessage("Birthday cannot be in the future.");
     }
 }

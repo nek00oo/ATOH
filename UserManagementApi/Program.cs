@@ -34,20 +34,23 @@ services.AddSwaggerGen(c =>
     {
         Title = "User Management API",
         Version = "v1",
-        Description = "API для управления пользователями. Использует JWT + Cookies аутентификацию."
+        Description = "API для управления пользователями. Есть возможность использовать JWT токен через header или JWT + Cookies аутентификацию, проставляется автоматически после login."
     });
     
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
-
-    c.AddSecurityDefinition("JWT_Cookie", new OpenApiSecurityScheme
+    
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Type = SecuritySchemeType.ApiKey,
-        In = ParameterLocation.Cookie,
-        Name = "token",
-        Description = "JWT токен в cookie. Требуется для аутентифицированных запросов."
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme"
     });
+    
     
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -57,11 +60,11 @@ services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "JWT_Cookie"
+                    Id = "Bearer"
                 }
             },
             Array.Empty<string>()
-        }
+        },
     });
 });
 
