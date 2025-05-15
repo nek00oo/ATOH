@@ -1,7 +1,14 @@
 ## ⚙️ Запуск проекта
+Перейти в api
 ```bash
 cd .\UserManagementApi\
+```
+Установить зависимости
+```bash
 dotnet restore
+```
+Поднять контейнер с бд
+```bash
 docker-compose up -d
 ```
 Далее можно запускать проект, через Rider/Visual Studio автоматически откроется браузер со swagger.
