@@ -7,6 +7,7 @@ public static class ResultExtensions
         message = result switch
         {
             Result<T>.SuccessType success => "",
+            Result<T>.SuccessCreateType successCreate => "",
             Result<T>.FailureType failure => failure.Error,
             Result<T>.NotFoundType notFound => notFound.Message,
             _ => throw new InvalidOperationException("Unknown Result type")
@@ -15,6 +16,7 @@ public static class ResultExtensions
         return result switch
         {
             Result<T>.SuccessType success => success.Value,
+            Result<T>.SuccessCreateType successCreate => successCreate.Value,
             _ => default
         };
     }

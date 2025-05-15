@@ -1,12 +1,13 @@
 ## ⚙️ Запуск проекта
 ```bash
+cd .\UserManagementApi\
 dotnet restore
 docker-compose up -d
 ```
 Далее можно запускать проект, через Rider/Visual Studio автоматически откроется браузер со swagger.
 Иначе, через команду:
 ```bash
-dotnet run --project UserManagementApi
+dotnet run
 ```
 Swagger будет по url: http://localhost:5120/swagger/index.html
 

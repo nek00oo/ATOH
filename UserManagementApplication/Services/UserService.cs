@@ -56,7 +56,7 @@ public class UserService : IUserService
                 return new Result<UserResponse>.FailureType(error);
 
             await _usersRepository.CreateAsync(userModel);
-            return Result<UserResponse>.Success(_userResponseMapper.ToResponse(userModel));
+            return Result<UserResponse>.SuccessCreate(_userResponseMapper.ToResponse(userModel));
         }
         catch (UniqueConstraintException ex)
         {
