@@ -9,6 +9,7 @@ docker-compose up -d
 dotnet run --project UserManagementApi
 ```
 Swagger будет по url: http://localhost:5120/swagger/index.html
+
 *Миграция применится автоматически с запуском с готовым админом. Требуется только залогиниться: login: "admin", password: "admin"
 
 # 🧑‍💼 User Management System
