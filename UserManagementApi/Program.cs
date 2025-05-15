@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentValidation;
 using Infrastructure.Authentication;
 using Infrastructure.Data;
+using Infrastructure.Entities;
 using Infrastructure.Mappers;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.CookiePolicy;
@@ -15,6 +16,7 @@ using UserManagementApplication.Services;
 using UserManagementApplication.Utils;
 using UserManagementApplication.Validators;
 using UserManagementCore.Contracts;
+using UserManagementCore.Types;
 using UserManagementServer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,8 +70,6 @@ services.AddSwaggerGen(c =>
     });
 });
 
-//TODO потом попробовать сделать через OnConfiguring
-// Trusted_connection=true;TrustServerCertificate=true;
 services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString(nameof(UserDbContext))));
 
@@ -87,6 +87,34 @@ services.AddScoped<IUsersRepository, UsersRepository>();
 services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+app.MigrateDatabase();
+
+//Добавление админа admin:admin
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+    var passwordEncoder = scope.ServiceProvider.GetRequiredService<IPasswordEncoder>();
+    
+    if (!db.Users.Any(u => u.Admin))
+    {
+        var adminUser = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Login = "admin",
+            Password = passwordEncoder.HashPassword("admin"),
+            Name = "Administrator",
+            Gender = Gender.Man,
+            Admin = true,
+            CreatedOn = DateTime.UtcNow,
+            CreatedBy = "system",
+            ModifiedOn = DateTime.UtcNow,
+            ModifiedBy = "system"
+        };
+
+        db.Users.Add(adminUser);
+        await db.SaveChangesAsync();
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
