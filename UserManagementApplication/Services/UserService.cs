@@ -137,7 +137,7 @@ public class UserService : IUserService
 
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(updatedUser));
         }
-        catch (InvalidOperationException ex)
+        catch (UserNotFoundException ex)
         {
             return Result<UserResponse>.Failure(ex.Message);
         }
@@ -175,7 +175,7 @@ public class UserService : IUserService
 
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(updatedUser));
         }
-        catch (InvalidOperationException ex)
+        catch (UserNotFoundException ex)
         {
             return Result<UserResponse>.Failure(ex.Message);
         }
@@ -206,7 +206,11 @@ public class UserService : IUserService
 
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(updatedUser));
         }
-        catch (InvalidOperationException ex)
+        catch (UniqueConstraintException ex)
+        {
+            return Result<UserResponse>.Failure(ex.Message);
+        }
+        catch (UserNotFoundException ex)
         {
             return Result<UserResponse>.Failure(ex.Message);
         }
@@ -232,7 +236,7 @@ public class UserService : IUserService
 
             return Result<bool>.Success(result);
         }
-        catch (InvalidOperationException ex)
+        catch (UserNotFoundException ex)
         {
             return Result<bool>.Failure(ex.Message);
         }
@@ -253,7 +257,7 @@ public class UserService : IUserService
             var user = await _usersRepository.RestoreAsync(login);
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
         }
-        catch (InvalidOperationException ex)
+        catch (UserNotFoundException ex)
         {
             return Result<UserResponse>.Failure(ex.Message);
         }
