@@ -1,7 +1,7 @@
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace UserManagementServer.Extensions;
+namespace UserManagementServer.Extensions.Infrastructure;
 
 public static class WebApplicationExtensions
 {

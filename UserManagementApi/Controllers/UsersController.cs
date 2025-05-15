@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagementApplication.Abstractions;
 using UserManagementApplication.Dto;
-using UserManagementServer.Extensions;
+using UserManagementServer.Extensions.Application;
 
 namespace UserManagementServer.Controllers;
 

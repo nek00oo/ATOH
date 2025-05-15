@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using UserManagementCore.Common;
 
-namespace UserManagementServer.Extensions;
+namespace UserManagementServer.Extensions.Application;
 
 public static class ResultExtensions
 {

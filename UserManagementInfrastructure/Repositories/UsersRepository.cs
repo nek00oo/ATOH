@@ -57,6 +57,8 @@ public class UsersRepository : IUsersRepository
         
         var activeUsers = activeUsersEntities
             .Select(_persistenceMapper.ToDomain)
+            .Where(u => u != null)
+            .Cast<UserModel>()
             .ToList();
 
         return activeUsers;
@@ -71,6 +73,8 @@ public class UsersRepository : IUsersRepository
         
         return entities
             .Select(_persistenceMapper.ToDomain)
+            .Where(u => u != null)
+            .Cast<UserModel>()
             .ToList();
     }
 

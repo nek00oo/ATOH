@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserManagementApplication.Abstractions;
 using UserManagementApplication.Dto;
 using UserManagementCore.Common;
-using UserManagementServer.Extensions;
+using UserManagementServer.Extensions.Application;
 
 namespace UserManagementServer.Controllers;
 

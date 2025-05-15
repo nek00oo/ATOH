@@ -3,11 +3,11 @@ using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace UserManagementServer.Extensions;
+namespace UserManagementServer.Extensions.Authentication;
 
 public static class ApiExtensions
 {
-    public static void AddApiExtensions(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddApiExtensions(this IServiceCollection services, IConfiguration config)
     {
         var jwtOptions = config.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
 
@@ -52,6 +52,8 @@ public static class ApiExtensions
                 policyBuilder.RequireClaim("Admin", "true");
             });
         });
+
+        return services;
     }
 
 }
