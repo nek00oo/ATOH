@@ -181,4 +181,22 @@ public class UsersController(IUserService userService) : ControllerBase
         var result = await userService.DeleteUserAsync(login, softDelete, currentUserLogin);
         return result.ToActionResult();
     }
+    
+    /// <summary>
+    /// Восстановить удаленного пользователя (очищает поля RevokedOn/RevokedBy)
+    /// </summary>
+    /// <param name="login">Логин пользователя</param>
+    /// <returns>Восстановленный пользователь</returns>
+    /// <response code="200">Пользователь успешно восстановлен</response>
+    /// <response code="400">Ошибка при восстановлении</response>
+    /// <response code="401">Требуется аутентификация</response>
+    /// <response code="403">Недостаточно прав (требуется роль Admin)</response>
+    /// <response code="404">Пользователь не найден</response>
+    [HttpPatch("{login}/restore")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> RestoreUser(string login)
+    {
+        var result = await userService.RestoreUserAsync(login);
+        return result.ToActionResult();
+    }
 }

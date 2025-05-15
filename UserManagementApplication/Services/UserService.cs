@@ -243,6 +243,10 @@ public class UserService : IUserService
     {
         try
         {
+            var targetUser = await _usersRepository.FindByLoginAsync(login);
+            if (targetUser is null)
+                return Result<UserResponse>.NotFound("User not found");
+            
             var user = await _usersRepository.RestoreAsync(login);
             return Result<UserResponse>.Success(_userResponseMapper.ToResponse(user));
         }
