@@ -1,6 +1,3 @@
-Репозиторий GitHub:
-https://github.com/nek00oo/ATOH
-
 ## ⚙️ Запуск проекта
 Перейти в api
 ```bash
