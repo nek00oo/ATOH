@@ -2,9 +2,10 @@ using Infrastructure.Authentication;
 using Infrastructure.Data;
 using Infrastructure.Entities;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
-using UserManagementApplication.Abstractions;
 using UserManagementApplication.Extensions;
+using UserManagementCore.Contracts;
 using UserManagementCore.Types;
 using UserManagementServer.Extensions;
 using UserManagementServer.Extensions.Application;
@@ -15,7 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-services.AddControllers();
+services.AddControllers(options => 
+{
+    options.OutputFormatters.Add(new StreamOutputFormatter());
+});
 
 services.AddApplicationValidators();
 services.ConfigureCustomModelValidation();

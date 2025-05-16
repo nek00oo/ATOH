@@ -9,9 +9,9 @@ public interface IUsersRepository
     
     Task<UserModel?> FindByLoginAsync(string login);
     
-    Task<List<UserModel>> GetActiveUsersAsync();
+    IAsyncEnumerable<UserModel> GetActiveUsersAsync();
     
-    Task<List<UserModel>> GetUsersOlderThanAsync(int age);
+    IAsyncEnumerable<UserModel> GetUsersOlderThanAsync(int age);
     
     Task<UserModel> UpdateProfileAsync(
         string login, 

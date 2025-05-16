@@ -11,13 +11,13 @@ public class AuthService : IAuthService
     private readonly IUsersRepository _usersRepository;
     private readonly IPasswordEncoder _passwordEncoder;
     private readonly IJwtProvider _jwtProvider;
-    private readonly UserResponseMapper _userResponseMapper;
+    private readonly IUserResponseMapper _userResponseMapper;
 
     public AuthService(
         IUsersRepository usersRepository,
         IPasswordEncoder passwordEncoder,
         IJwtProvider jwtProvider,
-        UserResponseMapper userResponseMapper)
+        IUserResponseMapper userResponseMapper)
     {
         _usersRepository = usersRepository;
         _passwordEncoder = passwordEncoder;

@@ -12,12 +12,12 @@ public class UserService : IUserService
 {
     private readonly IUsersRepository _usersRepository;
     private readonly IPasswordEncoder _passwordEncoder;
-    private readonly UserResponseMapper _userResponseMapper;
+    private readonly IUserResponseMapper _userResponseMapper;
 
     public UserService(
         IUsersRepository usersRepository,
         IPasswordEncoder passwordEncoder,
-        UserResponseMapper userResponseMapper)
+        IUserResponseMapper userResponseMapper)
     {
         _usersRepository = usersRepository;
         _passwordEncoder = passwordEncoder;
@@ -89,31 +89,20 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<Result<List<UserResponse>>> GetActiveUsersAsync()
+    public async IAsyncEnumerable<UserResponse> GetActiveUsersAsync()
     {
-        try
+        await foreach (var user in _usersRepository.GetActiveUsersAsync())
         {
-            var users = await _usersRepository.GetActiveUsersAsync();
-            var response = users.Select(_userResponseMapper.ToResponse).ToList();
-            return Result<List<UserResponse>>.Success(response);
+            yield return _userResponseMapper.ToResponse(user);
         }
-        catch (Exception ex)
-        {
-            return Result<List<UserResponse>>.Failure($"Failed to get active users: {ex.Message}");
-        }
+        
     }
 
-    public async Task<Result<List<UserResponse>>> GetUsersOlderThanAsync(int age)
+    public async IAsyncEnumerable<UserResponse> GetUsersOlderThanStreamAsync(int age)
     {
-        try
+        await foreach (var user in _usersRepository.GetUsersOlderThanAsync(age))
         {
-            var users = await _usersRepository.GetUsersOlderThanAsync(age);
-            var response = users.Select(_userResponseMapper.ToResponse).ToList();
-            return Result<List<UserResponse>>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            return Result<List<UserResponse>>.Failure($"Failed to get users older than {age}: {ex.Message}");
+            yield return _userResponseMapper.ToResponse(user);
         }
     }
 

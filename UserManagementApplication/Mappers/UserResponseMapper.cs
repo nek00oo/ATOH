@@ -1,9 +1,10 @@
+using UserManagementApplication.Abstractions;
 using UserManagementApplication.Dto;
 using UserManagementCore.Models;
 
 namespace UserManagementApplication.Mappers;
 
-public class UserResponseMapper
+public class UserResponseMapper : IUserResponseMapper
 {
     public UserResponse ToResponse(UserModel user)
     {

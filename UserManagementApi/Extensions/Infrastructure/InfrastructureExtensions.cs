@@ -8,7 +8,7 @@ public static class InfrastructureExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
-        services.AddSingleton<UserPersistenceMapper>();
+        services.AddSingleton<IUserPersistenceMapper, UserPersistenceMapper>();
         services.AddScoped<IUsersRepository, UsersRepository>();
         
         return services;

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagementApplication.Abstractions;
@@ -51,34 +52,38 @@ public class UsersController(IUserService userService) : ControllerBase
     }
     
     /// <summary>
-    /// Получить список активных пользователей
+    /// Получить поток активных пользователей (streaming)
     /// </summary>
-    /// <returns>Список активных пользователей</returns>
-    /// <response code="200">Успешный запрос</response>
+    /// <remarks>
+    /// Возвращает поток пользователей в режиме реального времени.
+    /// </remarks>
+    /// <returns>Поток пользователей в формате JSON-стрима</returns>
+    /// <response code="200">Начало потока данных</response>
     /// <response code="401">Требуется аутентификация</response>
     /// <response code="403">Недостаточно прав (требуется роль Admin)</response>
     [HttpGet("active")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> GetActiveUsers()
+    public IAsyncEnumerable<UserResponse> GetActiveUsers()
     {
-        var result = await userService.GetActiveUsersAsync();
-        return result.ToActionResult();
+        return userService.GetActiveUsersAsync();
     }
     
     /// <summary>
-    /// Получить пользователей старше указанного возраста
+    /// Получить пользователей старше указанного возраста (streaming)
     /// </summary>
-    /// <param name="age">Минимальный возраст</param>
-    /// <returns>Список пользователей</returns>
-    /// <response code="200">Успешный запрос</response>
+    /// <remarks>
+    /// Возвращает поток пользователей в режиме реального времени.
+    /// </remarks>
+    /// <returns>Поток пользователей в формате JSON-стрима</returns>
+    /// <response code="200">Начало потока данных</response>
     /// <response code="401">Требуется аутентификация</response>
-    /// <response code="403">Недостаточно прав (требуется роль Admin)</response>
+    /// <response code="403">Недостаточно прав</response>
     [HttpGet("older-than/{age}")]
-    [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> GetUsersOlderThan(int age)
+    [ProducesResponseType(typeof(IAsyncEnumerable<UserResponse>), 200)]
+    [ProducesResponseType(400)]
+    public IAsyncEnumerable<UserResponse> GetUsersOlderThan([Range(0, 150)] int age)
     {
-        var result = await userService.GetUsersOlderThanAsync(age);
-        return result.ToActionResult();
+        return userService.GetUsersOlderThanStreamAsync(age);
     }
     
     /// <summary>

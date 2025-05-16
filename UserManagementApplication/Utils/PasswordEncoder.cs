@@ -1,4 +1,4 @@
-using UserManagementApplication.Abstractions;
+using UserManagementCore.Contracts;
 
 namespace UserManagementApplication.Utils;
 

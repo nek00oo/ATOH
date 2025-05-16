@@ -1,4 +1,4 @@
-namespace UserManagementApplication.Abstractions;
+namespace UserManagementCore.Contracts;
 
 public interface IPasswordEncoder
 {

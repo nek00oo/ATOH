@@ -4,7 +4,7 @@ using UserManagementCore.Models;
 
 namespace Infrastructure.Mappers;
 
-public class UserPersistenceMapper
+public class UserPersistenceMapper : IUserPersistenceMapper
 {
     public UserModel? ToDomain(UserEntity entity)
     {

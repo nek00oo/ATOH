@@ -11,7 +11,7 @@ public static class ApplicationExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddSingleton<UserResponseMapper>();
+        services.AddSingleton<IUserResponseMapper, UserResponseMapper>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddValidators();

@@ -8,7 +8,7 @@ using UserManagementCore.Types;
 
 namespace Infrastructure.Repositories;
 
-public class UsersRepository(UserDbContext dbContext, UserPersistenceMapper persistenceMapper)
+public class UsersRepository(UserDbContext dbContext, IUserPersistenceMapper persistenceMapper)
     : IUsersRepository
 {
     public async Task<UserModel> CreateAsync(UserModel userModel)
@@ -39,35 +39,35 @@ public class UsersRepository(UserDbContext dbContext, UserPersistenceMapper pers
         return user;
     }
 
-    public async Task<List<UserModel>> GetActiveUsersAsync()
+    public async IAsyncEnumerable<UserModel> GetActiveUsersAsync()
     {
-        var activeUsersEntities =  await dbContext.Users
+        var activeUsersEntities =  dbContext.Users
             .AsNoTracking()
             .Where(u => u.RevokedOn == null)
             .OrderBy(u => u.CreatedOn)
-            .ToListAsync();
-        
-        var activeUsers = activeUsersEntities
-            .Select(persistenceMapper.ToDomain)
-            .Where(u => u != null)
-            .Cast<UserModel>()
-            .ToList();
+            .AsAsyncEnumerable();
 
-        return activeUsers;
+        await foreach (var activeUserEntity in activeUsersEntities)
+        {
+            var activeUser = persistenceMapper.ToDomain(activeUserEntity);
+            if (activeUser != null)
+                yield return activeUser;
+        }
     }
 
-    public async Task<List<UserModel>> GetUsersOlderThanAsync(int age)
+    public async IAsyncEnumerable<UserModel> GetUsersOlderThanAsync(int age)
     {
-        var entities = await dbContext.Users
+        var entities =  dbContext.Users
             .AsNoTracking()
             .Where(u => u.Birthday.HasValue && u.Birthday <= DateTime.UtcNow.AddYears(-age))
-            .ToListAsync();
+            .AsAsyncEnumerable();
         
-        return entities
-            .Select(persistenceMapper.ToDomain)
-            .Where(u => u != null)
-            .Cast<UserModel>()
-            .ToList();
+        await foreach (var entity in entities)
+        {
+            var user = persistenceMapper.ToDomain(entity);
+            if (user != null)
+                yield return user;
+        }
     }
 
     public async Task<UserModel> UpdateProfileAsync(
